@@ -64,8 +64,11 @@ export default function UserJobBoard() {
   const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const navigate = useNavigate()
+const [showProcessingModal, setShowProcessingModal] = useState(false) // New state for processing modal
+const [processingStep, setProcessingStep] = useState("") // New state for processing step message
 
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -85,32 +88,87 @@ export default function UserJobBoard() {
     fetchJobs()
   }, [BASE_URL])
 
-  const handleFileUpload = async () => {
+  // const handleFileUpload = async () => {
+  //   if (!file || !selectedJob) {
+  //     setError("Please select a resume file.")
+  //     return
+  //   }
+
+  //   setUploading(true)
+  //   setError(null)
+
+  //   const formData = new FormData()
+  //   formData.append("file", file)
+  //   formData.append("job_id", selectedJob.id.toString())
+
+  //   try {
+  //     const response = await axios.post(`${BASE_URL}/screen`, formData)
+  //     console.log("🎯 Required Skills:", response.data.required_skills)
+  //     setSelectedJob(null)
+  //     setFile(null)
+  //     toast.success("Resume uploaded successfully!")
+  //   } catch (error) {
+  //     const message = error?.response?.data?.detail || "Failed to upload resume. Please try again."
+  //     console.error("❌ Upload error:", error)
+  //     setError(message)
+  //     toast.error(message)
+  //   } finally {
+  //     setUploading(false)
+  //   }
+  // }
+
+    const handleFileUpload = async () => {
     if (!file || !selectedJob) {
       setError("Please select a resume file.")
       return
     }
 
-    setUploading(true)
-    setError(null)
+    // Close the file upload dialog immediately
+    setSelectedJob(null)
+
+    setUploading(true) // Disable the submit button (though dialog is closing)
+    setError(null) // Clear any previous errors
+
+    // Open the processing modal and set initial step
+    setShowProcessingModal(true)
+    setProcessingStep("Uploading resume...")
 
     const formData = new FormData()
     formData.append("file", file)
-    formData.append("job_id", selectedJob.id.toString())
+    formData.append("job_id", selectedJob.id.toString()) // Use selectedJob from closure
 
     try {
+      // Simulate initial upload delay
+      await new Promise(resolve => setTimeout(resolve, 1500))
+
+      // Update step to analyzing
+      setProcessingStep("Analyzing the resume...")
+      // Simulate analysis delay
+      await new Promise(resolve => setTimeout(resolve, 2000))
+
+      // Perform the actual API call
       const response = await axios.post(`${BASE_URL}/screen`, formData)
       console.log("🎯 Required Skills:", response.data.required_skills)
-      setSelectedJob(null)
-      setFile(null)
+
+      // Update step to sending to admin
+      setProcessingStep("Sending to the admin...")
+      // Simulate final sending delay
+      await new Promise(resolve => setTimeout(resolve, 1500))
+
+      // Close processing modal and show success toast
+      setShowProcessingModal(false)
+      setFile(null) // Clear selected file
       toast.success("Resume uploaded successfully!")
+
     } catch (error) {
       const message = error?.response?.data?.detail || "Failed to upload resume. Please try again."
       console.error("❌ Upload error:", error)
-      setError(message)
+      // Close processing modal and show error toast
+      setShowProcessingModal(false)
+      setError(message) // This error might be displayed on the main page if the dialog is closed
       toast.error(message)
     } finally {
-      setUploading(false)
+      setUploading(false) // Reset uploading state
     }
   }
 
@@ -397,6 +455,30 @@ export default function UserJobBoard() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+ {/* New Dialog for Processing Animation */}
+        <Dialog open={showProcessingModal}>
+          <DialogContent
+            className="w-[90vw] max-w-sm bg-white/95 backdrop-blur-sm border-slate-200 rounded-lg p-6 text-center"
+            onPointerDownOutside={(e) => e.preventDefault()} // Prevent closing on outside click
+            onEscapeKeyDown={(e) => e.preventDefault()} // Prevent closing on ESC key
+          >
+            <div className="flex flex-col items-center justify-center py-8">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-6" />
+              <DialogTitle className="text-xl font-semibold text-slate-900 mb-2">
+                {processingStep}
+              </DialogTitle>
+              <DialogDescription className="text-slate-600 text-sm">
+                Please wait, this may take a moment.
+              </DialogDescription>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+
+
+
+
       </div>
     </div>
   )
