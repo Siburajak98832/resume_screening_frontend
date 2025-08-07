@@ -690,7 +690,6 @@
 // }
 
 "use client"
-
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -698,6 +697,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
@@ -850,52 +850,6 @@ const [showSmtpModal, setShowSmtpModal] = useState(false)
 const now = new Date()
 
 const activeJobs = jobs.filter(job => new Date(job.deadline) > now)
-
-
-  // const sendEmail = async (log, status) => {
-  //   setEmailSending(true)
-  //   try {
-  //     await axios.post(`${BASE_URL}/send-email`, {
-  //       email: log.email,
-  //       name: log.name||"candidate",
-  //       status,
-  //       best_role: log.role,
-  //       score: log.final_score,
-  //       job_id: log.job_id,
-  //     })
-  //     toast.success(`Email sent to ${log.email}`)
-  //   } catch (err) {
-  //     console.error(err.response?.data || err.message)
-  //     toast.error("Failed to send email")
-  //   }finally{
-  //     setEmailSending(false)
-  //   }
-  // }
-
-//   const sendEmail = async (log, status) => {
-//   if (!senderCreds) {
-//     setShowCredModal(true);
-//     return;
-//   }
-// setEmailSending(true)
-//   try {
-//     await axios.post(`${BASE_URL}/send-email`, {
-//       email: log.email,
-//       name: log.name,
-//       status,
-//       best_role: log.role,
-//       score: log.final_score,
-//       job_id: log.job_id,
-//       sender_email: senderCreds.email,
-//       sender_password: senderCreds.passkey,
-//     });
-//     toast.success(`Email sent to ${log.email}`);
-//   } catch (err) {
-//     console.error(err.response?.data || err.message);
-//     toast.error("Failed to send email");
-//   }
-// };
-
 
 const handleSendEmailToAll = () => {
   if (!smtpConfig) {
@@ -1196,9 +1150,10 @@ const sendEmail = async (log, status, smtpConfig) => {
                     <span className="sm:hidden">Post Job</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-sm border-slate-200"> 
-                  <DialogHeader className="flex-shrink-0">
-                    <DialogTitle className="text-lg sm:text-xl md:text-2xl text-slate-900 text-center">
+                <DialogContent className="w-[95vw] sm:max-w-md md:max-w-lg lg:max-w-xl max-h-[90vh] flex flex-col bg-white/95 backdrop-blur-sm border-slate-200">
+                  {/* Header */}
+                  <DialogHeader className="shrink-0">
+                    <DialogTitle className="text-lg sm:text-xl text-slate-900 text-center">
                       {editJobId ? "Edit Job Posting" : "Create New Job"}
                     </DialogTitle>
                     <DialogDescription className="text-sm sm:text-base text-center text-slate-600">
@@ -1206,92 +1161,76 @@ const sendEmail = async (log, status, smtpConfig) => {
                     </DialogDescription>
                   </DialogHeader>
 
-                  <ScrollArea className="flex-1 px-1 sm:px-2">
-                    <div className="space-y-1 sm:space-y-1 py-2">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Job Title *</label>
-                        <Input
-                          placeholder="e.g. Senior Software Engineer"
-                          value={newJob.title}
-                          onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
-                          className="border-slate-200 h-10 sm:h-11"
-                        />
-                        {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
-                      </div>
+                  {/* Scrollable Form Section */}
+                  <ScrollArea className="flex-1 px-1 sm:px-2 overflow-auto">
+                    <div className="space-y-4 py-2">
+                      {/* Job Title */}
+                      <Label>Job Title *</Label>
+                      <Input
+                        value={newJob.title}
+                        onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
+                        placeholder="e.g. Software Engineer"
+                      />
+                      {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
 
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Job Description *</label>
-                        <Textarea
-                          placeholder="Describe the role, responsibilities, and requirements..."
-                          value={newJob.description}
-                          onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
-                          className="border-slate-200 resize-none overflow-auto min-h-[100px] sm:min-h-[120px] max-h-[200px]"
-                          rows={4}
-                        />
-                        {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
-                      </div>
+                      {/* Description */}
+                      <Label>Description *</Label>
+                      <Textarea
+                        value={newJob.description}
+                        onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
+                        placeholder="Write a job description..."
+                      />
+                      {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">Department *</label>
-                          <Input
-                            placeholder="e.g. Engineering"
-                            value={newJob.department}
-                            onChange={(e) => setNewJob({ ...newJob, department: e.target.value })}
-                            className="border-slate-200 h-10 sm:h-11"
-                          />
-                          {errors.department && <p className="text-xs text-red-500 mt-1">{errors.department}</p>}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">Location *</label>
-                          <Input
-                            placeholder="e.g. New York, NY"
-                            value={newJob.location}
-                            onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
-                            className="border-slate-200 h-10 sm:h-11"
-                          />
-                          {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
-                        </div>
-                      </div>
+                      {/* Department */}
+                      <Label>Department *</Label>
+                      <Input
+                        value={newJob.department}
+                        onChange={(e) => setNewJob({ ...newJob, department: e.target.value })}
+                        placeholder="e.g. Engineering"
+                      />
+                      {errors.department && <p className="text-red-500 text-sm">{errors.department}</p>}
 
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Required Skills *</label>
-                        <Input
-                          placeholder="e.g. React, Node.js, TypeScript, AWS"
-                          value={newJob.required_skills}
-                          onChange={(e) => setNewJob({ ...newJob, required_skills: e.target.value })}
-                          className="border-slate-200 h-10 sm:h-11"
-                        />
-                        {errors.required_skills && (
-                          <p className="text-xs text-red-500 mt-1">{errors.required_skills}</p>
-                        )}
-                      </div>
+                      {/* Location */}
+                      <Label>Location *</Label>
+                      <Input
+                        value={newJob.location}
+                        onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
+                        placeholder="e.g. New York, NY"
+                      />
+                      {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
 
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Company Name *</label>
-                        <Input
-                          placeholder="e.g. Tech Corp Inc."
-                          value={newJob.company_name}
-                          onChange={(e) => setNewJob({ ...newJob, company_name: e.target.value })}
-                          className="border-slate-200 h-10 sm:h-11"
-                        />
-                        {errors.company_name && <p className="text-xs text-red-500 mt-1">{errors.company_name}</p>}
-                      </div>
+                      {/* Required Skills */}
+                      <Label>Required Skills *</Label>
+                      <Input
+                        value={newJob.required_skills}
+                        onChange={(e) => setNewJob({ ...newJob, required_skills: e.target.value })}
+                        placeholder="e.g. React, Node.js, TypeScript"
+                      />
+                      {errors.required_skills && <p className="text-red-500 text-sm">{errors.required_skills}</p>}
 
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Application Deadline *</label>
-                        <Input
-                          type="datetime-local"
-                          value={newJob.deadline}
-                          onChange={(e) => setNewJob({ ...newJob, deadline: e.target.value })}
-                          className="border-slate-200 h-10 sm:h-11"
-                        />
-                        {errors.deadline && <p className="text-xs text-red-500 mt-1">{errors.deadline}</p>}
-                      </div>
+                      {/* Company Name */}
+                      <Label>Company Name *</Label>
+                      <Input
+                        value={newJob.company_name}
+                        onChange={(e) => setNewJob({ ...newJob, company_name: e.target.value })}
+                        placeholder="e.g. Tech Corp Inc."
+                      />
+                      {errors.company_name && <p className="text-red-500 text-sm">{errors.company_name}</p>}
+
+                      {/* Deadline */}
+                      <Label>Application Deadline *</Label>
+                      <Input
+                        type="datetime-local"
+                        value={newJob.deadline}
+                        onChange={(e) => setNewJob({ ...newJob, deadline: e.target.value })}
+                      />
+                      {errors.deadline && <p className="text-red-500 text-sm">{errors.deadline}</p>}
                     </div>
                   </ScrollArea>
 
-                  <DialogFooter className="flex-shrink-0 gap-3 pt-4 sm:pt-6 flex-col sm:flex-row border-t border-slate-200 mt-4">
+                  {/* Sticky Footer Buttons */}
+                  <DialogFooter className="shrink-0 gap-2 mt-4 pt-4 border-t border-slate-200 flex-col sm:flex-row">
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -1308,18 +1247,19 @@ const sendEmail = async (log, status, smtpConfig) => {
                         })
                         setErrors({})
                       }}
-                      className="border-slate-200 text-slate-600 hover:bg-slate-50 w-full sm:w-auto h-10 sm:h-11"
+                      className="w-full sm:w-auto"
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={postOrUpdateJob}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white w-full sm:w-auto h-10 sm:h-11 shadow-md hover:shadow-lg transition-all duration-200"
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-full sm:w-auto"
                     >
                       {editJobId ? "Update Job" : "Create Job"}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
+
               </Dialog>
             </div>
           </div>

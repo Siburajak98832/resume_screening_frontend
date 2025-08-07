@@ -249,7 +249,9 @@ export default function JobsPage() {
         )}
 
         <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
-          <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-sm border-slate-200">
+          {/* <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-sm border-slate-200"> */}
+          <DialogContent className="w-[90vw] sm:max-w-md md:max-w-lg lg:max-w-xl bg-white/95 backdrop-blur-sm border-slate-200">
+
             <DialogHeader>
               <DialogTitle className="text-xl text-slate-900">Apply for {selectedJob?.title}</DialogTitle>
               <DialogDescription className="text-slate-600">
